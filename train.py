@@ -26,7 +26,7 @@ def add_neuron(inputs, split_dim, activation_function = None):
     #     outputs = Z
     # else:
     #     outputs = activation_function(Z)
-    return Z, activation_function(Z)
+    return Z, activation_function(Z), Weights, biases
 
 def normalization(data):
     # add one more layer and return the output of this layer
@@ -80,12 +80,18 @@ learning_rate = 0.01
 beta1 = 0.5
 
 #build neural network
+ws = []
+bs = []
 for i in range(len(split_dims)):
     if i == 0:
-        logit, hidden_layer1 = add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
+        logit, hidden_layer1, w, b = add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
+        ws.append(w)
+        bs.append(b)
     else:
-        templogit, tempprob = add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
+        templogit, tempprob, w, b = add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
         hidden_layer1 = tf.concat([hidden_layer1, tempprob], 1)
+        ws.append(w)
+        bs.append(b)
 
 pd_Weights = tf.cast(tf.Variable(tf.random_normal([len(split_dims), 1])), tf.float64)
 pd_biases = tf.cast(tf.Variable(tf.zeros([1]) + 0.1), tf.float64)
@@ -131,3 +137,9 @@ print(right_0, wrong_0, right_1, wrong_1)
 print("accuracy for 0: ", right_0/(right_0+wrong_0))
 print("accuracy for 1: ", right_1/(right_1+wrong_1))
 print("total accuracy: ", (right_1+right_0)/(right_1+wrong_1+right_0+wrong_0))
+
+for i in range(len(split_dims)):
+    print("neuron1_" + str(i) + "_w:", sess.run(ws[i]))
+    print("neuron1_" + str(i) + "_b:", sess.run(bs[i]))
+print("neuron2_0_w:", sess.run(pd_Weights))
+print("neuron2_0_b:", sess.run(pd_biases))
