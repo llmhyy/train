@@ -4,8 +4,8 @@ import os
 
 def add_neuron(inputs, split_dim, activation_function = None):
     x = tf.cast(tf.slice(inputs, [0, split_dim[0]], [tf.shape(inputs)[0], split_dim[1] - split_dim[0]]),tf.float64)
-    Weights = tf.cast(tf.Variable(tf.random_normal([split_dim[1] - split_dim[0], 1])),tf.float64)
-    biases = tf.cast(tf.Variable(tf.zeros([1]) + 0.1),tf.float64)
+    Weights = tf.cast(tf.Variable(tf.random_normal([split_dim[1] - split_dim[0], 1])), tf.float64)
+    biases = tf.cast(tf.Variable(tf.zeros([1]) + 0.1), tf.float64)
     Wx_plus_b = tf.matmul(x, Weights) + biases
     return Wx_plus_b, activation_function(Wx_plus_b)
 
@@ -39,7 +39,7 @@ x_data = normalization(x_data)
 
 y_data = data[:,0:1]
 
-#define placeholder for inputs
+# define placeholder for inputs
 xs = tf.placeholder(tf.float64, [None, len(x_data[0])])
 ys = tf.placeholder(tf.float64, [None, 1])
 
