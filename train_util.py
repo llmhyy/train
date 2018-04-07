@@ -3,7 +3,6 @@ import numpy as np
 
 import os
 import shutil
-import train_util
 
 def add_neuron(inputs, split_dim, activation_function = None):
     # add one more layer and return the output of this layer
@@ -14,21 +13,18 @@ def add_neuron(inputs, split_dim, activation_function = None):
     :param activation_function:
     :return:
     """
-    slice = tf.slice(inputs, [0, split_dim[0]], [tf.shape(inputs)[0], split_dim[1] - split_dim[0]])
-    x = tf.cast(slice, tf.float64)
 
-    W = tf.Variable(tf.random_normal([split_dim[1] - split_dim[0], 1]))
-    Weights = tf.cast(W ,tf.float64)
-    # biases = tf.Variable(tf.zeros([1, out_size]) + 0.1)
-    b = tf.Variable(tf.zeros([1]) + 0.1)
-    biases = tf.cast(b,tf.float64)
-
-    Z = tf.matmul(x, Weights) + biases
+    scope_name = "group" + str(split_dim[0]);
+    with tf.name_scope(scope_name):
+        x = tf.slice(inputs, [0, split_dim[0]], [tf.shape(inputs)[0], split_dim[1] - split_dim[0]])
+        W = tf.Variable(tf.random_normal([split_dim[1] - split_dim[0], 1]))
+        b = tf.Variable(tf.zeros([1]) + 0.1)
+        Z = tf.matmul(x, W) + b
     # if activation_function is None:
     #     outputs = Z
     # else:
     #     outputs = activation_function(Z)
-    return Z, activation_function(Z), Weights, biases
+    return Z, activation_function(Z), W, b
 
 def normalization(data):
     # add one more layer and return the output of this layer
@@ -53,7 +49,7 @@ def remove(checkpoint_dir):
     if os.path.exists(checkpoint_dir):
         shutil.rmtree(checkpoint_dir)
 
-def save(sess, saver, checkpoint_dir):
+def save(sess, saver, checkpoint_dir, model_file):
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
 
@@ -61,9 +57,21 @@ def save(sess, saver, checkpoint_dir):
         sess,
         os.path.join(
             checkpoint_dir,
-            'NN.model'))
+            model_file))
+
+def load(sess, saver, checkpoint_dir):
+    ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+    if ckpt and ckpt.model_checkpoint_path:
+        ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
+        saver.restore(
+            sess, os.path.join(
+                checkpoint_dir, ckpt_name))
+        return sess
+    else:
+        return sess
 
 def printAccuracy(prediction_value, y_data):
+    print("data size: ", len(prediction_value))
     right_1 = 0
     right_0 = 0
     wrong_1 = 0

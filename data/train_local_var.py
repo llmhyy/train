@@ -1,13 +1,31 @@
 import tensorflow as tf
 import numpy as np
-import os
-import shutil
+
 import train_util
 
 # the 2nd dimension is probably [1, 3]
-split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
+split_dims = [[0,1], [1,3], [3,5], [6,7], [7,110], [110,213], [213,316], [316,419], [419,522], [522,625]]
 
-data = np.loadtxt("./control_data/control.csv", delimiter=',')
+data = np.loadtxt("./data_data/local_var.csv", delimiter=',')
+positive_data = []
+negative_data = []
+for i in range(len(data)):
+    d = data[i]
+    if d[0]==1 :
+        positive_data.append(d)
+    else:
+        negative_data.append(d)
+
+enhanced_data = []
+loop = int(len(negative_data)/len(positive_data)) - 1
+for i in range(loop):
+    for j in range(len(positive_data)):
+        enhanced_data.append(positive_data[j])
+
+array = np.asarray(enhanced_data)
+data = np.append(data, array, axis=0)
+
+
 
 x_data = data[:,1:]
 x_data = train_util.normalization(x_data)
@@ -59,7 +77,7 @@ for i in range(1000):
 checkpoint_dir = "checkpoint"
 train_util.remove(checkpoint_dir)
 saver = tf.train.Saver(t_vars)
-train_util.save(sess, saver, checkpoint_dir)
+train_util.save(sess, saver, checkpoint_dir, "train_local_var")
 
 prediction_value = sess.run(pd_prob, feed_dict={xs: x_data})
 train_util.printAccuracy(prediction_value, y_data)
