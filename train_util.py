@@ -70,7 +70,7 @@ def load(sess, saver, checkpoint_dir):
     else:
         return sess
 
-def printAccuracy(prediction_value, y_data):
+def printAccuracy(prediction_value, x_data, y_data):
     print("data size: ", len(prediction_value))
     right_1 = 0
     right_0 = 0

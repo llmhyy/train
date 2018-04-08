@@ -2,16 +2,17 @@ import tensorflow as tf
 import numpy as np
 import train_util
 import predict
+import random
 
 # split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
 split_dims = [[0,3],[3,5],[5,6]]
 
-data = np.loadtxt("./control_data/control.csv", delimiter=',')
+usecol=[]
+for i in range(4, 628):
+    usecol.append(i)
 
-x_data = data[:,1:]
-# x_data = train_util.normalization(x_data)
-
-y_data = data[:,0:1]
+x_data = np.loadtxt("./control_data/control.csv", delimiter=',', usecols=usecol)
+y_data = np.loadtxt("./control_data/control.csv", delimiter=',', usecols=[3], ndmin=2)
 
 #define placeholder for inputs
 xs = tf.placeholder(tf.float32, [None, len(x_data[0])], name="Input")
@@ -24,6 +25,12 @@ dprob = 0.0
 learning_rate = 0.05
 iteration_time = 2000
 beta1 = 0.5
+random_seed = 0;
+cost_threshold = 0.42
+
+random.seed(random_seed)
+np.random.seed(random_seed)
+tf.set_random_seed(random_seed)
 
 #build neural network
 ws = []
@@ -57,10 +64,15 @@ init = tf.global_variables_initializer()
 with tf.Session() as sess:
     sess.run(init)
 
-    for i in range(iteration_time):
+    training_accuracy = 10
+    while training_accuracy > cost_threshold:
         sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
         training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
         print("step %d, training accuracy %f" % (i, training_accuracy))
+    # for i in range(iteration_time):
+    #     sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
+    #     training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
+    #     print("step %d, training accuracy %f" % (i, training_accuracy))
 
     checkpoint_dir = "checkpoint"
     train_util.remove(checkpoint_dir)
@@ -69,10 +81,10 @@ with tf.Session() as sess:
     tf.summary.FileWriter("checkpoint/graph", sess.graph)
 
     prediction_value = sess.run(pd_prob, feed_dict={xs: x_data})
-    # train.printWeight(split_dims, sess, ws, bs, pd_Weights, pd_biases)
+    train_util.printWeight(split_dims, sess, ws, bs, pd_Weights, pd_biases)
 
 print("training accuracy")
-train_util.printAccuracy(prediction_value, y_data)
+train_util.printAccuracy(prediction_value, x_data, y_data)
 
 print("testing accuracy")
 predict.testModel('checkpoint/train_control.meta',
