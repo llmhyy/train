@@ -9,12 +9,14 @@ split_dims = [[0,3],[3,5],[5,6]]
 data = np.loadtxt("./control_data/control.csv", delimiter=',')
 
 x_data = data[:,1:]
-x_data = train_util.normalization(x_data)
+# x_data = train_util.normalization(x_data)
 
 y_data = data[:,0:1]
 
 #define placeholder for inputs
 xs = tf.placeholder(tf.float32, [None, len(x_data[0])], name="Input")
+normalized_xs = tf.nn.batch_normalization(xs, 0, 1, 0, 1, 0.001, name="Norm_Input")
+
 ys = tf.placeholder(tf.float32, [None, 1], name="Label")
 
 # train
@@ -28,9 +30,9 @@ ws = []
 bs = []
 for i in range(len(split_dims)):
     if i == 0:
-        logit, hidden_layer1, w, b = train_util.add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
+        logit, hidden_layer1, w, b = train_util.add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
     else:
-        templogit, tempprob, w, b = train_util.add_neuron(xs, split_dims[i], activation_function = tf.nn.relu)
+        templogit, tempprob, w, b = train_util.add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
         hidden_layer1 = tf.concat([hidden_layer1, tempprob], 1)
     ws.append(w)
     bs.append(b)

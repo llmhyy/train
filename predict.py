@@ -10,7 +10,7 @@ def testModel(model_file, model_dir, test_file):
 
     data = np.loadtxt(test_file, delimiter=',')
     x_data = data[:,1:]
-    x_data = train_util.normalization(x_data)
+    # x_data = train_util.normalization(x_data)
     y_data = data[:,0:1]
 
     graph = tf.get_default_graph()
