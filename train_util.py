@@ -42,7 +42,7 @@ def train(tensors, x_data, y_data, cost_threshold,
         tf.summary.FileWriter(checkpoint_filename+"/graph", sess.graph)
 
         prediction_value = sess.run(prob_tensor, feed_dict={xs: x_data})
-        printWeight(split_dims, sess, ws1, bs1, ws2, bs2)
+        # printWeight(split_dims, sess, ws1, bs1, ws2, bs2)
 
         return prediction_value
 
