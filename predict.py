@@ -3,14 +3,10 @@ import numpy as np
 import train_util
 import os.path
 
-def testModel(model_file, model_dir, test_file):
+def testModel(model_file, model_dir, test_file, usecol):
     sess = tf.Session()
     saver = tf.train.import_meta_graph(model_file)
     saver.restore(sess, tf.train.latest_checkpoint(model_dir))
-
-    usecol=[]
-    for i in range(4, 628):
-        usecol.append(i)
 
     # d = np.loadtxt(test_file, delimiter=',', comments='@', dtype='str')
     x_data = np.loadtxt(test_file, delimiter=',', comments='@', usecols=usecol)

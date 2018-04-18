@@ -1,8 +1,74 @@
 import tensorflow as tf
 import numpy as np
+import Tensors
 
 import os
 import shutil
+
+def train(tesnors, x_data, y_data, cost_threshold,
+          checkpoint_filename, model_filename):
+
+    training_tensor = tensors.training_tensor
+
+
+    init = tf.global_variables_initializer()
+
+    with tf.Session() as sess:
+        sess.run(init)
+
+        training_accuracy = 10
+        while training_accuracy > cost_threshold:
+            sess.run(training_tensor, feed_dict={xs: x_data, ys: y_data})
+            training_accuracy = sess.run(cost_tensor, feed_dict={xs: x_data, ys: y_data})
+            print("step %d, training accuracy %f" % (i, training_accuracy))
+        # for i in range(iteration_time):
+        #     sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
+        #     training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
+        #     print("step %d, training accuracy %f" % (i, training_accuracy))
+
+        checkpoint_dir = checkpoint_filename
+        remove(checkpoint_dir)
+
+        t_vars = tf.trainable_variables()
+        saver = tf.train.Saver(t_vars)
+        save(sess, saver, checkpoint_dir, model_filename)
+        tf.summary.FileWriter(checkpoint_filename+"/graph", sess.graph)
+
+        prediction_value = sess.run(prob_tensor, feed_dict={xs: x_data})
+        printWeight(split_dims, sess, ws1, bs1, ws2, bs2)
+
+def buildNetwork(split_dims, xs, ys, learning_rate):
+    normalized_xs = tf.nn.batch_normalization(xs, 0, 1, 0, 1, 0.001, name="Norm_Input")
+
+    graph = tf.get_default_graph()
+    list_of_tuples = [op.values() for op in graph.get_operations()]
+    print(list_of_tuples)
+
+    ws1 = []
+    bs1 = []
+    for i in range(len(split_dims)):
+        if i == 0:
+            logit, hidden_layer1, w, b = add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
+        else:
+            templogit, tempprob, w, b = add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
+            hidden_layer1 = tf.concat([hidden_layer1, tempprob], 1)
+        ws1.append(w)
+        bs1.append(b)
+
+    with tf.name_scope("2nd"):
+        ws2 = tf.Variable(tf.random_normal([len(split_dims), 1]), name="W2")
+        bs2 = tf.add(tf.Variable(tf.zeros([1])), 0.1, name="b2")
+        pd_Z = tf.add(tf.matmul(hidden_layer1, ws2), bs2, name="Z2")
+        prob_tensor = tf.nn.sigmoid(pd_Z, name="Output")
+
+    # loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pd_Z, labels=ys))
+    # train_step = tf.train.AdamOptimizer(learning_rate, beta1 = beta1).minimize(loss, var_list=t_vars)
+    cost_tensor = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pd_Z, labels=ys))
+    t_vars = tf.trainable_variables()
+    training_tensor = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost_tensor, var_list=t_vars)
+
+    return training_tensor, prob_tensor, cost_tensor, ws1, bs1, ws2, bs2
+
 
 def add_neuron(inputs, split_dim, activation_function = None):
     # add one more layer and return the output of this layer

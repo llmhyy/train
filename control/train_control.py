@@ -3,6 +3,12 @@ import numpy as np
 import train_util
 import predict
 import random
+import Tensors
+
+checkpoint_filename = "checkpoint_control"
+model_filename = "control"
+train_file = "./control_data/control.csv"
+test_file = "./control_data/control_test.csv"
 
 # split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
 split_dims = [[0,3],[3,5],[5,6]]
@@ -11,13 +17,11 @@ usecol=[]
 for i in range(4, 628):
     usecol.append(i)
 
-x_data = np.loadtxt("./control_data/control.csv", delimiter=',', usecols=usecol)
-y_data = np.loadtxt("./control_data/control.csv", delimiter=',', usecols=[3], ndmin=2)
+x_data = np.loadtxt(train_file, delimiter=',', usecols=usecol)
+y_data = np.loadtxt(train_file, delimiter=',', usecols=[3], ndmin=2)
 
 #define placeholder for inputs
 xs = tf.placeholder(tf.float32, [None, len(x_data[0])], name="Input")
-normalized_xs = tf.nn.batch_normalization(xs, 0, 1, 0, 1, 0.001, name="Norm_Input")
-
 ys = tf.placeholder(tf.float32, [None, 1], name="Label")
 
 # train
@@ -32,61 +36,23 @@ random.seed(random_seed)
 np.random.seed(random_seed)
 tf.set_random_seed(random_seed)
 
-#build neural network
-ws = []
-bs = []
-for i in range(len(split_dims)):
-    if i == 0:
-        logit, hidden_layer1, w, b = train_util.add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
-    else:
-        templogit, tempprob, w, b = train_util.add_neuron(normalized_xs, split_dims[i], activation_function = tf.nn.relu)
-        hidden_layer1 = tf.concat([hidden_layer1, tempprob], 1)
-    ws.append(w)
-    bs.append(b)
+training_tensor, prob_tensor, cost_tensor, ws1, bs1, ws2, bs2 = \
+    train_util.buildNetwork(split_dims, xs, ys, learning_rate)
 
-with tf.name_scope("2nd"):
-    pd_Weights = tf.Variable(tf.random_normal([len(split_dims), 1]), name="W2")
-    pd_biases = tf.add(tf.Variable(tf.zeros([1])), 0.1, name="b2")
-    pd_Z = tf.add(tf.matmul(hidden_layer1, pd_Weights), pd_biases, name="Z2")
-    pd_prob = tf.nn.sigmoid(pd_Z, name="Output")
-t_vars = tf.trainable_variables()
-
-
-# loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pd_Z, labels=ys))
-# train_step = tf.train.AdamOptimizer(learning_rate, beta1 = beta1).minimize(loss, var_list=t_vars)
-cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pd_Z, labels=ys))
-train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost, var_list=t_vars)
+# graph = tf.get_default_graph()
+# list_of_tuples = [op.values() for op in graph.get_operations()]
+# print(list_of_tuples)
 
 #initialization
 # init = tf.initialize_all_variables()
-init = tf.global_variables_initializer()
 
-with tf.Session() as sess:
-    sess.run(init)
-
-    training_accuracy = 10
-    while training_accuracy > cost_threshold:
-        sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
-        training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
-        print("step %d, training accuracy %f" % (i, training_accuracy))
-    # for i in range(iteration_time):
-    #     sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
-    #     training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
-    #     print("step %d, training accuracy %f" % (i, training_accuracy))
-
-    checkpoint_dir = "checkpoint"
-    train_util.remove(checkpoint_dir)
-    saver = tf.train.Saver(t_vars)
-    train_util.save(sess, saver, checkpoint_dir, "train_control")
-    tf.summary.FileWriter("checkpoint/graph", sess.graph)
-
-    prediction_value = sess.run(pd_prob, feed_dict={xs: x_data})
-    train_util.printWeight(split_dims, sess, ws, bs, pd_Weights, pd_biases)
+tesnors = Tensors(training_tensor, cost_tensor, prob_tensor, xs, ys,\
+                 ws1, bs1, ws2, bs2)
 
 print("training accuracy")
 train_util.printAccuracy(prediction_value, x_data, y_data)
 
 print("testing accuracy")
-predict.testModel('checkpoint/train_control.meta',
-                  'checkpoint',
-                  'control_data/control_test.csv')
+predict.testModel(checkpoint_filename+'/' + model_filename + '.meta',
+                  checkpoint_filename,
+                  test_file, usecol)
