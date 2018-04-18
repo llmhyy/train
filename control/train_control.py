@@ -10,8 +10,8 @@ model_filename = "control"
 train_file = "./control_data/control.csv"
 test_file = "./control_data/control_test.csv"
 
-# split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
-split_dims = [[0,3],[3,5],[5,6]]
+split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
+# split_dims = [[0,3],[3,5],[5,6]]
 
 usecol=[]
 for i in range(4, 628):
@@ -29,7 +29,7 @@ dprob = 0.0
 learning_rate = 0.05
 iteration_time = 2000
 beta1 = 0.5
-random_seed = 0;
+random_seed = 25;
 cost_threshold = 0.42
 
 random.seed(random_seed)
