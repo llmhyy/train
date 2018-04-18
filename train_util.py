@@ -1,15 +1,22 @@
 import tensorflow as tf
 import numpy as np
-import Tensors
+import tensors
 
 import os
 import shutil
 
-def train(tesnors, x_data, y_data, cost_threshold,
-          checkpoint_filename, model_filename):
+def train(tensors, x_data, y_data, cost_threshold,
+          checkpoint_filename, model_filename, split_dims):
 
     training_tensor = tensors.training_tensor
-
+    cost_tensor = tensors.cost_tensor
+    prob_tensor = tensors.prob_tensor
+    xs = tensors.xs
+    ys = tensors.ys
+    ws1 = tensors.ws1
+    bs1 = tensors.bs1
+    ws2 = tensors.ws2
+    bs2 = tensors.bs2
 
     init = tf.global_variables_initializer()
 
@@ -20,7 +27,7 @@ def train(tesnors, x_data, y_data, cost_threshold,
         while training_accuracy > cost_threshold:
             sess.run(training_tensor, feed_dict={xs: x_data, ys: y_data})
             training_accuracy = sess.run(cost_tensor, feed_dict={xs: x_data, ys: y_data})
-            print("step %d, training accuracy %f" % (i, training_accuracy))
+            print("training accuracy %f" % (training_accuracy))
         # for i in range(iteration_time):
         #     sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
         #     training_accuracy = sess.run(cost, feed_dict={xs: x_data, ys: y_data})
@@ -37,13 +44,10 @@ def train(tesnors, x_data, y_data, cost_threshold,
         prediction_value = sess.run(prob_tensor, feed_dict={xs: x_data})
         printWeight(split_dims, sess, ws1, bs1, ws2, bs2)
 
+        return prediction_value
+
 def buildNetwork(split_dims, xs, ys, learning_rate):
     normalized_xs = tf.nn.batch_normalization(xs, 0, 1, 0, 1, 0.001, name="Norm_Input")
-
-    graph = tf.get_default_graph()
-    list_of_tuples = [op.values() for op in graph.get_operations()]
-    print(list_of_tuples)
-
     ws1 = []
     bs1 = []
     for i in range(len(split_dims)):

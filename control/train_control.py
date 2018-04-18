@@ -3,7 +3,7 @@ import numpy as np
 import train_util
 import predict
 import random
-import Tensors
+import tensors
 
 checkpoint_filename = "checkpoint_control"
 model_filename = "control"
@@ -46,8 +46,10 @@ training_tensor, prob_tensor, cost_tensor, ws1, bs1, ws2, bs2 = \
 #initialization
 # init = tf.initialize_all_variables()
 
-tesnors = Tensors(training_tensor, cost_tensor, prob_tensor, xs, ys,\
-                 ws1, bs1, ws2, bs2)
+tensors = tensors.Tensors(training_tensor, cost_tensor, prob_tensor, xs, ys, ws1, bs1, ws2, bs2)
+
+prediction_value = train_util.train(tensors, x_data, y_data, cost_threshold,
+          checkpoint_filename, model_filename, split_dims)
 
 print("training accuracy")
 train_util.printAccuracy(prediction_value, x_data, y_data)
