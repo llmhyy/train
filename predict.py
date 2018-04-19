@@ -17,3 +17,12 @@ def testModel(model_file, model_dir, test_file, usecol):
     xs = graph.get_tensor_by_name("Input:0")
     prediction_value = sess.run(pb_prob, feed_dict={xs: x_data})
     train_util.printAccuracy(prediction_value, x_data, y_data)
+
+def retrieveNNModel(model_file, model_dir):
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph(model_file)
+    saver.restore(sess, tf.train.latest_checkpoint(model_dir))
+
+    graph = tf.get_default_graph()
+
+    return sess, graph

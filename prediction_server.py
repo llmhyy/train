@@ -4,9 +4,23 @@ from sys import stdout
 import numpy as np
 import predict as pre
 
-sess, graph = pre.retrieveNNModel('control/checkpoint/train_control.meta',
-                  'control/checkpoint',
-                  'control/control_data/control_test.csv')
+print("start")
+
+type = stdin.readline()
+checkpoint_filename = ""
+model_filename = ""
+if "control" in type:
+    checkpoint_filename = "control/checkpoint_control"
+    model_filename = "control"
+elif "field" in type:
+    checkpoint_filename = "data/checkpoint_field"
+    model_filename = "field"
+else:
+    checkpoint_filename = "data/checkpoint_local_var"
+    model_filename = "local_var"
+
+sess, graph = pre.retrieveNNModel(checkpoint_filename+'/' + model_filename + '.meta',
+                  checkpoint_filename)
 pb_prob = graph.get_tensor_by_name("2nd/Output:0")
 xs = graph.get_tensor_by_name("Input:0")
 
