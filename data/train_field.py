@@ -11,11 +11,11 @@ model_filename = "field"
 train_file = "./data_data/field.csv"
 test_file = "./data_data/field_test.csv"
 
-split_dims = [[0,1], [1,4], [4,7], [7,8], [8,111], [111,214], [214,317], [317,420], [420,523], [523,626]]
+split_dims = [[0,1], [1,5], [5,9], [9,10], [10,113], [113,216], [216,319], [319,422], [422,525], [525,628]]
 split_dims = [[0,1], [1,4], [4,7], [7,8]]
 
 usecol=[]
-for i in range(4, 630):
+for i in range(4, 632):
     usecol.append(i)
 
 x_data = np.loadtxt(train_file, delimiter=',', usecols=usecol)
