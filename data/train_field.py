@@ -12,7 +12,7 @@ train_file = "./data_data/field.csv"
 test_file = "./data_data/field_test.csv"
 
 split_dims = [[0,1], [1,5], [5,9], [9,10], [10,113], [113,216], [216,319], [319,422], [422,525], [525,628]]
-split_dims = [[0,1], [1,4], [4,7], [7,8]]
+# split_dims = [[0,1], [1,4], [4,7], [7,8]]
 
 usecol=[]
 for i in range(4, 632):
@@ -32,7 +32,7 @@ for i in range(len(x_data)):
 
 enhanced_data = []
 loop = int(len(negative_data)/len(positive_data)) - 1
-for i in range((int)(loop/100)):
+for i in range((int)(loop)):
     for j in range(len(positive_data)):
         enhanced_data.append(positive_data[j])
 
@@ -59,7 +59,7 @@ learning_rate = 0.05
 iteration_time = 2000
 beta1 = 0.5
 random_seed = 0;
-cost_threshold = 0.7
+cost_threshold = 0.5
 
 # random.seed(random_seed)
 # np.random.seed(random_seed)

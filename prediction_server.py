@@ -4,7 +4,7 @@ from sys import stdout
 import numpy as np
 import predict as pre
 
-print("start")
+# print("start")
 
 type = stdin.readline()
 checkpoint_filename = ""
