@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-import tensors
 
 import os
 import shutil

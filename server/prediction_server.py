@@ -2,7 +2,7 @@ from sys import stdin
 from sys import stdout
 
 import numpy as np
-import predict as pre
+from util import predict as pre
 
 # print("start")
 
@@ -10,13 +10,13 @@ type = stdin.readline()
 checkpoint_filename = ""
 model_filename = ""
 if "control" in type:
-    checkpoint_filename = "control/checkpoint_control"
+    checkpoint_filename = "../control/checkpoint_control"
     model_filename = "control"
 elif "field" in type:
-    checkpoint_filename = "data/checkpoint_field"
+    checkpoint_filename = "../data/checkpoint_field"
     model_filename = "field"
 else:
-    checkpoint_filename = "data/checkpoint_local_var"
+    checkpoint_filename = "../data/checkpoint_local_var"
     model_filename = "local_var"
 
 sess, graph = pre.retrieveNNModel(checkpoint_filename+'/' + model_filename + '.meta',

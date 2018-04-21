@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
-import train_util
-import os.path
+from util import train_util
+
 
 def testModel(model_file, model_dir, test_file, usecol):
     sess = tf.Session()

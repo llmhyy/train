@@ -1,10 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import train_util
-import predict
-import random
-import tensors
-from sklearn.utils import shuffle
+from util import predict, train_util, tensors
 
 checkpoint_filename = "checkpoint_field"
 model_filename = "field"
@@ -78,12 +74,12 @@ training_tensor, prob_tensor, cost_tensor, ws1, bs1, ws2, bs2 = \
 tensors = tensors.Tensors(training_tensor, cost_tensor, prob_tensor, xs, ys, ws1, bs1, ws2, bs2)
 
 prediction_value = train_util.train(tensors, x_data, y_data, cost_threshold,
-          checkpoint_filename, model_filename, split_dims)
+                                    checkpoint_filename, model_filename, split_dims)
 
 print("training accuracy")
 train_util.printAccuracy(prediction_value, x_data, y_data)
 
 print("testing accuracy")
-predict.testModel(checkpoint_filename+'/' + model_filename + '.meta',
+predict.testModel(checkpoint_filename + '/' + model_filename + '.meta',
                   checkpoint_filename,
                   test_file, usecol)
