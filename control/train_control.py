@@ -6,7 +6,7 @@ import random
 checkpoint_filename = "checkpoint_control"
 model_filename = "control"
 train_file = "./control_data/control.csv"
-test_file = "./control_data/control_test.csv"
+test_file = "./control_data/test/control.csv"
 
 split_dims = [[0,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
 # split_dims = [[0,3],[3,5],[5,6]]

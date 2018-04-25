@@ -6,7 +6,7 @@ import random
 checkpoint_filename = "checkpoint_local_var"
 model_filename = "local_var"
 train_file = "./data_data/local_var.csv"
-test_file = "./data_data/local_var_test.csv"
+test_file = "./data_data/test/local_var.csv"
 
 split_dims = [[0,1], [1,3], [3,5], [5,6], [6,109], [109,212], [212,315], [315,418], [418,521], [521,624]]
 # split_dims = [[0,1], [1,3], [3,5], [5,6]]

@@ -5,7 +5,7 @@ from util import predict, train_util, tensors
 checkpoint_filename = "checkpoint_field"
 model_filename = "field"
 train_file = "./data_data/field.csv"
-test_file = "./data_data/field_test.csv"
+test_file = "./data_data/test/field.csv"
 
 split_dims = [[0,1], [1,5], [5,9], [9,10], [10,113], [113,216], [216,319], [319,422], [422,525], [525,628]]
 # split_dims = [[0,1], [1,4], [4,7], [7,8]]
