@@ -50,7 +50,8 @@ prediction_value = train_util.train(tensors, x_data, y_data, cost_threshold,
                                     checkpoint_filename, model_filename, split_dims)
 
 print("training accuracy")
-train_util.printAccuracy(prediction_value, x_data, y_data)
+debug_info = np.loadtxt(train_file, delimiter=',', comments='@', usecols=[0,1,2], dtype='str')
+train_util.printAccuracy(prediction_value, x_data, y_data, debug_info)
 
 print("testing accuracy")
 predict.testModel(checkpoint_filename + '/' + model_filename + '.meta',

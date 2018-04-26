@@ -139,27 +139,36 @@ def load(sess, saver, checkpoint_dir):
     else:
         return sess
 
-def printAccuracy(prediction_value, x_data, y_data):
+def printAccuracy(prediction_value, x_data, y_data, debug_info):
     print("data size: ", len(prediction_value))
-    right_1 = 0
-    right_0 = 0
-    wrong_1 = 0
-    wrong_0 = 0
+    right_1 = []
+    right_0 = []
+    wrong_1 = []
+    wrong_0 = []
+
     for i in range(len(prediction_value)):
         if prediction_value[i][0] >= 0.5:
             if y_data[i][0] == 1:
-                right_1 += 1
+                right_1.append(debug_info[i])
             else:
-                wrong_0 += 1
+                wrong_0.append(debug_info[i])
         else:
             if y_data[i][0] == 0:
-                right_0 += 1
+                right_0.append(debug_info[i])
             else:
-                wrong_1 += 1
-    print(right_0, wrong_0, right_1, wrong_1)
-    print("accuracy for 0: ", right_0/(right_0+wrong_0))
-    print("accuracy for 1: ", right_1/(right_1+wrong_1))
-    print("total accuracy: ", (right_1+right_0)/(right_1+wrong_1+right_0+wrong_0))
+                wrong_1.append(debug_info[i])
+
+    right_0_len = len(right_0)
+    wrong_0_len = len(wrong_0)
+    right_1_len = len(right_1)
+    wrong_1_len = len(wrong_1)
+    print(right_0_len, wrong_0_len, right_1_len, wrong_1_len)
+    print("accuracy for 0: ", right_0_len/(right_0_len+wrong_0_len))
+    print("accuracy for 1: ", right_1_len/(right_1_len+wrong_1_len))
+    print("total accuracy: ", (right_1_len+right_0_len)/(right_1_len+wrong_1_len+right_0_len+wrong_0_len))
+
+    print("wrong_1:", wrong_1)
+    print("wrong_0:", wrong_0)
 
 def printWeight(split_dims, sess, ws, bs, pd_Weights, pd_biases):
     for i in range(len(split_dims)):
